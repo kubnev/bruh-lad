@@ -229,7 +229,8 @@ export default function GuideTab({ data }: Props) {
             <section key={ch.index} className={`chapter${chOpen ? ' open' : ''}`} hidden={!chVisible}>
               <h2>
                 <button className="disclosure" onClick={() => setOpenChapters((s) => toggleIn(s, ch.index))} aria-expanded={chOpen}>
-                  {ch.title}
+                  {/* Formatted title keeps the doc's styling, e.g. the struck-through "chopper" */}
+                  <span>{ch.titleFormatted ? <FormattedText content={ch.titleFormatted} /> : ch.title}</span>
                 </button>
               </h2>
               <div className="chapter-body">
