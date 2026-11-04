@@ -1,4 +1,4 @@
-import type { ContentItem, GuideData, Step } from './types';
+import type { ContentItem, GearBox, GuideData, Step } from './types';
 
 export interface StepEntry {
   step: Step;
@@ -11,6 +11,9 @@ export interface SectionEntry {
   key: string;
   title: string;
   steps: StepEntry[];
+  intro: ContentItem[][];
+  outro: ContentItem[][];
+  gear: GearBox[];
 }
 
 export interface ChapterEntry {
@@ -30,9 +33,12 @@ export function buildModel(data: GuideData): { chapters: ChapterEntry[]; stepIds
     const sections = ch.sections.map((sec, si) => ({
       key: `${ci}-${si}`,
       title: sec.title,
+      intro: sec.intro ?? [],
+      outro: sec.outro ?? [],
+      gear: sec.gear ?? [],
       steps: sec.steps.map((step) => {
         n++;
-        const id = `${ci + 1}-${n}`;
+        const id = step.id ?? `${ci + 1}-${n}`;
         stepIds.push(id);
         const text = [
           flat(step.content),

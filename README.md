@@ -1,7 +1,10 @@
 # bruh-lad
 
-A personal, stripped-down web version of the **BRUHsailer** ironman guide with
-**Ladlor's gear progression chart** in a second tab.
+A personal **OSRS Ironman Guide** site with two account types:
+
+- **Ironman:** the **BRUHsailer** guide, plus **Ladlor's gear progression chart**.
+- **Ultimate Ironman:** the OSRS Wiki's **Ultimate Ironman Walkthrough Guide to
+  Prifddinas**, in the same checklist format.
 
 - **Guide** tab: step checklist, search, highlight / remove highlights, reset
   progress. *Minimize completed* (on by default) hides finished steps except
@@ -15,14 +18,15 @@ A personal, stripped-down web version of the **BRUHsailer** ironman guide with
 
 ## Staying up to date
 
-Guide and chart data are fetched live from the upstream GitHub repositories on
-every page load, so guide updates and the **Last updated** date appear
+Guide and chart data are fetched live from upstream (GitHub, and the OSRS Wiki
+API for the Ultimate Ironman guide) on every page load, so guide updates and the **Last updated** date appear
 automatically — no redeploy needed. `public/data` holds fallback copies used
 only if GitHub is unreachable; refresh them with `npm run sync-data`.
 
-Step progress is keyed by step position (e.g. step `1-12`), the same as the
-original site. If the guide authors insert or remove steps upstream, ticks
-after that point can shift.
+BRUHsailer progress is keyed by step position (e.g. step `1-12`), the same as
+the original site, so inserted or removed steps upstream can shift later ticks.
+Ultimate Ironman steps are keyed by their text instead, because the wiki guide
+is edited often: an edit only resets the ticks of the steps that changed.
 
 ## Progress storage
 
@@ -49,3 +53,7 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 - **Ladlor's Interactive Gear Progression Chart** — [ladlorchart.com](https://ladlorchart.com/),
   source [Madssb/InteractiveGearProg](https://github.com/Madssb/InteractiveGearProg)
   (MIT, see `licenses/ladlorchart-MIT.txt`). Chart data and item icons come from that repository.
+- **Ultimate Ironman Walkthrough Guide to Prifddinas** by OSRS Wiki contributors —
+  [OSRS Wiki](https://oldschool.runescape.wiki/w/Guide:Ultimate_Ironman_Walkthrough_Guide_To_Prifddinas),
+  licensed [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/). Loaded live from the wiki API;
+  `public/data/uim` is a fallback copy.

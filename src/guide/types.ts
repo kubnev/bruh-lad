@@ -16,15 +16,32 @@ export interface ContentItem {
 }
 
 export interface Step {
+  /** Stable id for progress/highlights; when absent the step's position is used. */
+  id?: string;
   content: ContentItem[];
   nestedContent?: { level: number; content: ContentItem[] }[];
   metadata?: Record<string, string | undefined>;
 }
 
+export interface GearBox {
+  label: string;
+  items: string;
+}
+
+export interface Section {
+  title: string;
+  steps: Step[];
+  /** Paragraphs shown above / below the steps. */
+  intro?: ContentItem[][];
+  outro?: ContentItem[][];
+  /** Equipment / inventory setups shown under the steps. */
+  gear?: GearBox[];
+}
+
 export interface Chapter {
   title: string;
   titleFormatted?: ContentItem[];
-  sections: { title: string; steps: Step[] }[];
+  sections: Section[];
   footnotes?: { content: ContentItem[] }[];
 }
 

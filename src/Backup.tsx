@@ -4,6 +4,8 @@ import { useState } from 'react';
 const KEYS = [
   'guideProgress:main',
   'userHighlights:main',
+  'guideProgress:uim',
+  'userHighlights:uim',
   'guideMinimizeCompleted',
   'highlightColor',
   'milestonesComplete',

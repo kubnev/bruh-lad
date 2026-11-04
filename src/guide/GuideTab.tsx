@@ -1,13 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePersistentState } from '../storage';
 import { applyHighlights, clearHighlights, clearSearchMarks, collectHighlights, highlightSelection, markSearchTerm, removeHighlightAt, withGroups } from './dom';
-import { FormattedText } from './FormattedText';
-import { buildModel } from './model';
+import { FormattedParagraphs, FormattedText } from './FormattedText';
+import { buildModel, type SectionEntry } from './model';
 import { StepView } from './StepView';
-import { HIGHLIGHT_COLORS, type GuideData, type Highlight, type HighlightColor } from './types';
+import { HIGHLIGHT_COLORS, type ContentItem, type GuideData, type Highlight, type HighlightColor } from './types';
 
 interface Props {
   data: GuideData;
+  /** Storage namespace, so each guide keeps its own ticks and highlights ("main" = BRUHsailer). */
+  ns: string;
+}
+
+function Paragraphs({ paras }: { paras: ContentItem[][] }) {
+  return (
+    <div className="section-text">
+      {paras.map((p, i) => (
+        <FormattedParagraphs key={i} content={p} />
+      ))}
+    </div>
+  );
 }
 
 function useDebounced<T>(value: T, ms: number): T {
@@ -19,14 +31,14 @@ function useDebounced<T>(value: T, ms: number): T {
   return v;
 }
 
-export default function GuideTab({ data }: Props) {
+export default function GuideTab({ data, ns }: Props) {
   const { chapters, stepIds } = useMemo(() => buildModel(data), [data]);
 
   // Storage keys match the original site so its localStorage can be copied across.
-  const [progress, setProgress] = usePersistentState<Record<string, boolean>>('guideProgress:main', {});
+  const [progress, setProgress] = usePersistentState<Record<string, boolean>>(`guideProgress:${ns}`, {});
   // On: every completed step is hidden except the latest one, which stays as a collapsed row.
   const [minimized, setMinimized] = usePersistentState<boolean>('guideMinimizeCompleted', true);
-  const [highlights, setHighlights] = usePersistentState<Highlight[]>('userHighlights:main', []);
+  const [highlights, setHighlights] = usePersistentState<Highlight[]>(`userHighlights:${ns}`, []);
   const [color, setColor] = usePersistentState<HighlightColor>('highlightColor', 'yellow');
   const [highlightMode, setHighlightMode] = useState(false);
   const [query, setQuery] = useState('');
@@ -95,6 +107,10 @@ export default function GuideTab({ data }: Props) {
 
   const isHidden = (id: string) =>
     matches ? !matches.has(id) : minimized && !!progress[id] && id !== lastDoneId;
+
+  // A section shows while it has a visible step; text-only sections (no steps) show unless searching.
+  const sectionVisible = (sec: SectionEntry) =>
+    sec.steps.length ? sec.steps.some((st) => !isHidden(st.id)) : !matches;
 
   useEffect(() => {
     const root = rootRef.current;
@@ -223,7 +239,7 @@ export default function GuideTab({ data }: Props) {
 
       <div ref={rootRef} className={`guide${highlightMode ? ' highlighting' : ''}`}>
         {chapters.map((ch) => {
-          const chVisible = ch.sections.some((s) => s.steps.some((st) => !isHidden(st.id)));
+          const chVisible = ch.sections.some((s) => sectionVisible(s));
           const chOpen = openChapters.has(ch.index) || (!!matches && chVisible);
           return (
             <section key={ch.index} className={`chapter${chOpen ? ' open' : ''}`} hidden={!chVisible}>
@@ -235,7 +251,7 @@ export default function GuideTab({ data }: Props) {
               </h2>
               <div className="chapter-body">
                 {ch.sections.map((sec) => {
-                  const secVisible = sec.steps.some((st) => !isHidden(st.id));
+                  const secVisible = sectionVisible(sec);
                   const secOpen = openSections.has(sec.key) || (!!matches && secVisible);
                   return (
                     <div key={sec.key} className={`section${secOpen ? ' open' : ''}`} hidden={!secVisible}>
@@ -245,6 +261,7 @@ export default function GuideTab({ data }: Props) {
                         </button>
                       </h3>
                       <div className="section-body">
+                        {sec.intro.length > 0 && !matches && <Paragraphs paras={sec.intro} />}
                         {sec.steps.map((st) => {
                           const done = !!progress[st.id];
                           return (
@@ -260,6 +277,17 @@ export default function GuideTab({ data }: Props) {
                             />
                           );
                         })}
+                        {sec.outro.length > 0 && !matches && <Paragraphs paras={sec.outro} />}
+                        {sec.gear.length > 0 && !matches && (
+                          <div className="step-meta section-gear">
+                            {sec.gear.map((g, i) => (
+                              <div key={i} className="meta-box meta-items_needed">
+                                <div className="meta-label">{g.label}</div>
+                                <div className="meta-value">{g.items}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
