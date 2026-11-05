@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 // Upstream sources. Data is fetched live so guide updates (and the
 // "last updated" date) show up without redeploying this site. The copies in
-// public/data are only a fallback if GitHub is unreachable.
+// public/data are only a fallback if a source is unreachable.
 export const GUIDE_RAW = 'https://raw.githubusercontent.com/umkyzn/BRUHsailer/main/data';
 export const LADLOR_RAW = 'https://raw.githubusercontent.com/Madssb/InteractiveGearProg/main';
 

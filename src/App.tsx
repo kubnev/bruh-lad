@@ -5,6 +5,7 @@ import type { GuideData } from './guide/types';
 import ProgressionTab, { type LadlorData, type MilestoneMeta } from './progression/ProgressionTab';
 import { fetchWithFallback, GUIDE_RAW, LADLOR_RAW, useAsync } from './remote';
 import { usePersistentState } from './storage';
+import type { HighlightColor } from './guide/types';
 import { loadUimGuide, UIM_GUIDE_URL, type UimGuide } from './uim/wiki';
 
 type Mode = 'iron' | 'uim';
@@ -13,10 +14,10 @@ type Theme = 'auto' | 'light' | 'dark';
 
 const GUIDE_DOC = 'https://docs.google.com/document/d/1CBkFM70SnrW4hJXvHM2F1fYCuBF_fRnEXnTYgRnRkAE';
 
-// "#uim/guide", "#iron/progression"; the old "#guide" / "#progression" links mean Ironman.
 // Account types that have a Progression tab (Ultimate Ironman doesn't have one yet).
 const HAS_PROGRESSION: Record<Mode, boolean> = { iron: true, uim: false };
 
+// "#uim/guide", "#iron/progression"; the old "#guide" / "#progression" links mean Ironman.
 function routeFromHash(): { mode: Mode; tab: Tab } {
   const [a, b] = location.hash.replace(/^#/, '').split('/');
   const mode: Mode = a === 'uim' ? 'uim' : 'iron';
@@ -59,6 +60,10 @@ export default function App() {
   const [route, setRoute] = useState(routeFromHash);
   const { mode, tab } = route;
   const [theme, setTheme] = usePersistentState<Theme>('theme', 'auto');
+  // Shared by both guides, so changing them in one applies to the other straight away.
+  const [minimized, setMinimized] = usePersistentState<boolean>('guideMinimizeCompleted', true);
+  const [highlightColor, setHighlightColor] = usePersistentState<HighlightColor>('highlightColor', 'yellow');
+  const shared = { minimized, setMinimized, color: highlightColor, setColor: setHighlightColor };
 
   useEffect(() => {
     const onHash = () => setRoute(routeFromHash());
@@ -142,7 +147,7 @@ export default function App() {
             <a href="https://umkyzn.github.io/BRUHsailer/" target="_blank" rel="noreferrer">Original web version</a>
             {ironGuide.data && <> · Last updated: {formatDate(ironGuide.data.updatedOn)}</>}
           </p>
-          {ironGuide.data ? <GuideTab data={ironGuide.data} ns="main" /> : <Status what="guide" error={ironGuide.error} />}
+          {ironGuide.data ? <GuideTab data={ironGuide.data} ns="main" {...shared} /> : <Status what="guide" error={ironGuide.error} />}
         </div>
 
         <div hidden={!show('iron', 'progression')}>
@@ -160,9 +165,8 @@ export default function App() {
             <a href={UIM_GUIDE_URL} target="_blank" rel="noreferrer">View on the wiki</a>
             {uim.data?.updatedOn && <> · Last edited: {formatDate(uim.data.updatedOn)}</>}
           </p>
-          {uim.data ? <GuideTab data={uim.data} ns="uim" /> : <Status what="guide" error={uim.error} />}
+          {uim.data ? <GuideTab data={uim.data} ns="uim" {...shared} /> : <Status what="guide" error={uim.error} />}
         </div>
-
       </main>
       <Backup />
     </>

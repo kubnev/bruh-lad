@@ -2,7 +2,7 @@ import type { ContentItem, GearBox, GuideData, Step } from './types';
 
 export interface StepEntry {
   step: Step;
-  id: string; // "<chapter>-<n>", n counts steps within the chapter (matches the original site)
+  id: string; // "<chapter>-<n>" (position in the chapter) unless the step has its own id
   number: number;
   text: string; // lowercase searchable text
 }

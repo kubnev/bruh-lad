@@ -1,13 +1,9 @@
 {
   "name": "osrsiron",
   "private": true,
-  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "sync-data": "node scripts/sync-data.mjs"
+    "build": "tsc && vite build"
   },
   "dependencies": {
     "react": "^18.3.1",

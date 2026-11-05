@@ -4,7 +4,7 @@ import { fetchWithFallback } from '../remote';
 // OSRS Wiki: Ultimate Ironman Walkthrough Guide to Prifddinas (CC BY-NC-SA 3.0).
 // Loaded live from the wiki API (it allows cross-site requests), so wiki edits
 // show up without redeploying; public/data/uim holds a fallback copy.
-export const UIM_GUIDE_PAGE = 'Guide:Ultimate_Ironman_Walkthrough_Guide_To_Prifddinas';
+const UIM_GUIDE_PAGE = 'Guide:Ultimate_Ironman_Walkthrough_Guide_To_Prifddinas';
 export const UIM_GUIDE_URL = `https://oldschool.runescape.wiki/w/${UIM_GUIDE_PAGE}`;
 const WIKI = 'https://oldschool.runescape.wiki';
 const API = `${WIKI}/api.php`;

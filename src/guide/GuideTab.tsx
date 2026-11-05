@@ -10,6 +10,10 @@ interface Props {
   data: GuideData;
   /** Storage namespace, so each guide keeps its own ticks and highlights ("main" = BRUHsailer). */
   ns: string;
+  minimized: boolean;
+  setMinimized: (v: boolean | ((v: boolean) => boolean)) => void;
+  color: HighlightColor;
+  setColor: (c: HighlightColor) => void;
 }
 
 function Paragraphs({ paras }: { paras: ContentItem[][] }) {
@@ -31,15 +35,11 @@ function useDebounced<T>(value: T, ms: number): T {
   return v;
 }
 
-export default function GuideTab({ data, ns }: Props) {
+export default function GuideTab({ data, ns, minimized, setMinimized, color, setColor }: Props) {
   const { chapters, stepIds } = useMemo(() => buildModel(data), [data]);
 
-  // Storage keys match the original site so its localStorage can be copied across.
   const [progress, setProgress] = usePersistentState<Record<string, boolean>>(`guideProgress:${ns}`, {});
-  // On: every completed step is hidden except the latest one, which stays as a collapsed row.
-  const [minimized, setMinimized] = usePersistentState<boolean>('guideMinimizeCompleted', true);
   const [highlights, setHighlights] = usePersistentState<Highlight[]>(`userHighlights:${ns}`, []);
-  const [color, setColor] = usePersistentState<HighlightColor>('highlightColor', 'yellow');
   const [highlightMode, setHighlightMode] = useState(false);
   const [query, setQuery] = useState('');
   const term = useDebounced(query.trim().toLowerCase(), 200);
@@ -105,6 +105,7 @@ export default function GuideTab({ data, ns }: Props) {
     return null;
   }, [stepIds, progress]);
 
+  // Minimize completed: every ticked step is hidden except the latest one, kept as a collapsed row.
   const isHidden = (id: string) =>
     matches ? !matches.has(id) : minimized && !!progress[id] && id !== lastDoneId;
 
@@ -127,6 +128,8 @@ export default function GuideTab({ data, ns }: Props) {
     function onKey(e: KeyboardEvent) {
       const t = e.target as HTMLElement;
       const typing = t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable;
+      // Both guides stay mounted; only the one on screen should react.
+      if (!rootRef.current?.offsetParent) return;
       if (e.key === '/' && !typing) {
         e.preventDefault();
         searchRef.current?.focus();

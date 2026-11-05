@@ -53,7 +53,6 @@ export interface GuideData {
 export type HighlightColor = 'green' | 'yellow' | 'blue' | 'pink' | 'red' | 'purple';
 export const HIGHLIGHT_COLORS: HighlightColor[] = ['green', 'yellow', 'blue', 'pink', 'red', 'purple'];
 
-// Same shape the original site stores, so its localStorage entries can be copied over.
 export interface Highlight {
   parentId: string; // e.g. "step-1-4"
   htmlContent: string; // highlighted text
