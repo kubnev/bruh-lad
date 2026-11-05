@@ -1,4 +1,4 @@
-# bruh-lad
+# osrsiron
 
 A personal **OSRS Ironman Guide** site with two account types:
 
@@ -43,6 +43,8 @@ npm run build    # production build into dist/
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (Settings → Pages → Source: GitHub Actions).
+
+Live site: https://kubnev.github.io/osrsiron/
 
 ## Credits
 

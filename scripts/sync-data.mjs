@@ -20,7 +20,7 @@ await mkdir('public/data/ladlor', { recursive: true });
 await mkdir('public/data/uim', { recursive: true });
 for (const [url, dest] of files) {
   // The wiki asks API clients to identify themselves.
-  const res = await fetch(url, { headers: { 'User-Agent': 'bruh-lad guide data sync' } });
+  const res = await fetch(url, { headers: { 'User-Agent': 'osrsiron guide data sync' } });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   await writeFile(dest, await res.text());
   console.log(`${dest} <- ${url}`);
